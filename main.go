@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -328,6 +329,15 @@ func finishHTML() {
 	writeHTML(html)
 }
 
+func showHTML() {
+	path, err := filepath.Abs(filepath.Dir(config.Output))
+	if err != nil {
+		panic(err)
+	}
+	file := filepath.Join(path, config.Output)
+	fmt.Println(file)
+}
+
 func main() {
 	args := os.Args
 	if len(args) != 2 {
@@ -352,4 +362,5 @@ func main() {
 		appendHTML(values)
 	}
 	finishHTML()
+	showHTML()
 }
