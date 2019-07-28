@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -44,7 +45,6 @@ type configuration struct {
 }
 
 type product struct {
-	Seller             string
 	Image              string
 	Title              string
 	URL                string
@@ -207,9 +207,11 @@ func loadProduct(url string, porcentageDiscount float64) {
 	document := loadSite(url)
 	fmt.Print("+")
 
-	seller := getProductSeller(document.Selection)
-	if compareSeller(seller, config.Seller) == false {
-		return
+	if config.CSSProductSeller != "" {
+		seller := getProductSeller(document.Selection)
+		if compareSeller(seller, config.Seller) == false {
+			return
+		}
 	}
 
 	image := getProductImage(document.Selection)
@@ -217,7 +219,6 @@ func loadProduct(url string, porcentageDiscount float64) {
 	price := getProductPrice(document.Selection)
 
 	prod := product{
-		Seller:             seller,
 		Image:              image,
 		Title:              title,
 		URL:                url,
@@ -328,6 +329,15 @@ func finishHTML() {
 	writeHTML(html)
 }
 
+func showHTML() {
+	path, err := filepath.Abs(filepath.Dir(config.Output))
+	if err != nil {
+		panic(err)
+	}
+	file := filepath.Join(path, config.Output)
+	fmt.Println(file)
+}
+
 func main() {
 	args := os.Args
 	if len(args) != 2 {
@@ -352,4 +362,5 @@ func main() {
 		appendHTML(values)
 	}
 	finishHTML()
+	showHTML()
 }
