@@ -44,7 +44,6 @@ type configuration struct {
 }
 
 type product struct {
-	Seller             string
 	Image              string
 	Title              string
 	URL                string
@@ -207,9 +206,11 @@ func loadProduct(url string, porcentageDiscount float64) {
 	document := loadSite(url)
 	fmt.Print("+")
 
-	seller := getProductSeller(document.Selection)
-	if compareSeller(seller, config.Seller) == false {
-		return
+	if config.CSSProductSeller != "" {
+		seller := getProductSeller(document.Selection)
+		if compareSeller(seller, config.Seller) == false {
+			return
+		}
 	}
 
 	image := getProductImage(document.Selection)
@@ -217,7 +218,6 @@ func loadProduct(url string, porcentageDiscount float64) {
 	price := getProductPrice(document.Selection)
 
 	prod := product{
-		Seller:             seller,
 		Image:              image,
 		Title:              title,
 		URL:                url,
