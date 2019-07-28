@@ -18,6 +18,8 @@
     "css_product_price_attribute": "",
     "css_next_page": "link[rel=next]",
     "css_next_page_attribute": "href",
+    "regex_url_old": "",
+    "regex_url_new": "",
     "regex_price_old": "R\\$ ([[0-9]+),([0-9][0-9])",
     "regex_price_new": "$1.$2",
     "minimum_porcentage_discount": 60,

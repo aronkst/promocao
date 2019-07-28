@@ -37,6 +37,8 @@ type configuration struct {
 	CSSProductPriceAttribute       string  `json:"css_product_price_attribute"`
 	CSSNextPage                    string  `json:"css_next_page"`
 	CSSNextPageAttribute           string  `json:"css_next_page_attribute"`
+	RegexURLOld                    string  `json:"regex_url_old"`
+	RegexURLNew                    string  `json:"regex_url_new"`
 	RegexPriceOld                  string  `json:"regex_price_old"`
 	RegexPriceNew                  string  `json:"regex_price_new"`
 	MinimumPorcentageDiscount      float64 `json:"minimum_porcentage_discount"`
@@ -76,13 +78,18 @@ func loadSite(url string) *goquery.Document {
 	return document
 }
 
+func setRegex(value string, regexOld string, regexNew string) string {
+	var re = regexp.MustCompile(regexOld)
+	newValue := re.ReplaceAllString(value, regexNew)
+	return newValue
+}
+
 func formatPrice(price string) float64 {
 	if price == "" {
 		return 0
 	}
 
-	var re = regexp.MustCompile(config.RegexPriceOld)
-	priceNew := re.ReplaceAllString(price, config.RegexPriceNew)
+	priceNew := setRegex(price, config.RegexPriceOld, config.RegexPriceNew)
 
 	priceFloat, err := strconv.ParseFloat(priceNew, 64)
 	if err != nil {
@@ -90,6 +97,15 @@ func formatPrice(price string) float64 {
 	}
 
 	return priceFloat
+}
+
+func formatURL(url string) string {
+	if config.RegexURLNew == "" {
+		return url
+	}
+
+	urlNew := setRegex(url, config.RegexURLOld, config.RegexURLNew)
+	return urlNew
 }
 
 func clearString(value string) string {
@@ -125,6 +141,12 @@ func getPrice(price string, selector *goquery.Selection) float64 {
 	return priceFloat
 }
 
+func getURL(url string, selector *goquery.Selection) string {
+	urlCSS := getCSSValue(url, selector)
+	urlNew := formatURL(urlCSS)
+	return urlNew
+}
+
 func getProductsPrice(selector *goquery.Selection) float64 {
 	return getPrice("ProductsPrice", selector)
 }
@@ -134,7 +156,7 @@ func getProductsFinalPrice(selector *goquery.Selection) float64 {
 }
 
 func getProductsURL(selector *goquery.Selection) string {
-	return getCSSValue("ProductsURL", selector)
+	return getURL("ProductsURL", selector)
 }
 
 func getProductSeller(selector *goquery.Selection) string {
@@ -142,7 +164,7 @@ func getProductSeller(selector *goquery.Selection) string {
 }
 
 func getProductImage(selector *goquery.Selection) string {
-	return getCSSValue("ProductImage", selector)
+	return getURL("ProductImage", selector)
 }
 
 func getProductTitle(selector *goquery.Selection) string {
@@ -154,7 +176,7 @@ func getProductPrice(selector *goquery.Selection) float64 {
 }
 
 func getNextPage(selector *goquery.Selection) string {
-	return getCSSValue("NextPage", selector)
+	return getURL("NextPage", selector)
 }
 
 func loadProducts(url string) {
