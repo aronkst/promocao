@@ -4,8 +4,9 @@
 *.dll
 *.so
 *.dylib
-main
 *.html
+
+promocao
 
 # Test binary, build with `go test -c`
 *.test
