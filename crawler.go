@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -9,23 +10,24 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func loadSite(url string) *goquery.Document {
+func loadSite(url string) (*goquery.Document, error) {
 	response, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer response.Body.Close()
 	if response.StatusCode != 200 {
-		err := fmt.Sprintf("status code error: %d %s", response.StatusCode, response.Status)
-		panic(err)
+		message := fmt.Sprintf("status code error: %d %s", response.StatusCode, response.Status)
+		err := errors.New(message)
+		return nil, err
 	}
 
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return document
+	return document, nil
 }
 
 func getCSSValue(field string, selector *goquery.Selection) string {
@@ -93,7 +95,11 @@ func getNextPage(selector *goquery.Selection) string {
 }
 
 func loadProducts(url string) {
-	document := loadSite(url)
+	document, err := loadSite(url)
+	if err != nil {
+		return
+	}
+
 	fmt.Print("#")
 
 	document.Find(config.CSSProducts).Each(func(i int, s *goquery.Selection) {
@@ -118,14 +124,24 @@ func loadProducts(url string) {
 	if page < config.MaximumPages {
 		page++
 		nextPage := getNextPage(document.Selection)
-		loadProducts(nextPage)
+		if nextPage != "" {
+			loadProducts(nextPage)
+		}
 	}
 }
 
 func loadProduct(url string, porcentageDiscount float64) {
 	defer waitGroup.Done()
 
-	document := loadSite(url)
+	if url == "" {
+		return
+	}
+
+	document, err := loadSite(url)
+	if err != nil {
+		return
+	}
+
 	fmt.Print("+")
 
 	if config.CSSProductSeller != "" {

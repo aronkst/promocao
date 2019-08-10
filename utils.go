@@ -28,7 +28,7 @@ func formatPrice(price string) float64 {
 }
 
 func formatURL(url string) string {
-	if config.RegexURLNew == "" {
+	if config.RegexURLNew == "" || url == "" {
 		return url
 	}
 
