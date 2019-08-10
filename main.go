@@ -49,6 +49,7 @@ var config configuration
 var page = 1
 var products = make([]product, 0)
 var waitGroup sync.WaitGroup
+var finalHTML string
 
 func main() {
 	args := os.Args
@@ -67,12 +68,15 @@ func main() {
 
 	loadProducts(config.URL)
 	waitGroup.Wait()
+
 	fmt.Println()
 
+	deleteHTML()
 	createHTML()
 	for _, values := range products {
 		appendHTML(values)
 	}
 	finishHTML()
+	writeHTML()
 	showHTML()
 }
