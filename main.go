@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"sync"
 )
 
@@ -68,6 +69,10 @@ func main() {
 
 	loadProducts(config.URL)
 	waitGroup.Wait()
+
+	sort.Slice(products, func(i, j int) bool {
+		return products[i].PorcentageDiscount > products[j].PorcentageDiscount
+	})
 
 	fmt.Println()
 
