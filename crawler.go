@@ -116,6 +116,14 @@ func loadProducts(url string) {
 			return
 		}
 
+		if finalPrice > config.MaximumValue {
+			return
+		}
+
+		if finalPrice < config.MinimumValue {
+			return
+		}
+
 		urlProduct := getProductsURL(s)
 		waitGroup.Add(1)
 		go loadProduct(urlProduct, porcentageDiscount)
