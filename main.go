@@ -34,7 +34,9 @@ type configuration struct {
 	RegexPriceOld                  string  `json:"regex_price_old"`
 	RegexPriceNew                  string  `json:"regex_price_new"`
 	MinimumPorcentageDiscount      float64 `json:"minimum_porcentage_discount"`
-	MaximumPages                   int     `json:"maximum_pages"`
+	MaximumValue                   float64 `json:"maximum_value"`
+	MinimumValue                   float64 `json:"minimum_value"`
+	MaximumPages                   int64   `json:"maximum_pages"`
 	Output                         string  `json:"output"`
 }
 
@@ -47,7 +49,7 @@ type product struct {
 }
 
 var config configuration
-var page = 1
+var page int64 = 1
 var products = make([]product, 0)
 var waitGroup sync.WaitGroup
 var finalHTML string
